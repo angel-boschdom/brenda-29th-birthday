@@ -51,7 +51,7 @@
         .cake:hover {
             transform: scale(1.1);
         }
-        .balloon {
+        .float-emoji {
             font-size: 50px;
             position: absolute;
             opacity: 0;
@@ -66,6 +66,7 @@
             padding: 15px;
             border-radius: 10px;
             backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
         .sparkle {
             position: absolute;
@@ -98,7 +99,7 @@
             .message {
                 font-size: 1em;
             }
-            .balloon {
+            .float-emoji {
                 font-size: 30px;
             }
         }
@@ -117,22 +118,25 @@
         const message = document.getElementById('message');
         const container = document.querySelector('.container');
         let clickCount = 0;
+        const emojis = ['🎈', '🐣', '🎉', '🥂'];
+        let emojiIndex = 0;
 
-        function createBalloon() {
-            const balloon = document.createElement('div');
-            balloon.className = 'balloon';
-            balloon.innerText = '🎈';
-            balloon.style.left = Math.random() * window.innerWidth + 'px';
-            balloon.style.top = window.innerHeight + 'px';
-            container.appendChild(balloon);
+        function createFloatingEmoji() {
+            const floatEmoji = document.createElement('div');
+            floatEmoji.className = 'float-emoji';
+            floatEmoji.innerText = emojis[emojiIndex];
+            emojiIndex = (emojiIndex + 1) % emojis.length;  // Loop through emojis
+            floatEmoji.style.left = Math.random() * window.innerWidth + 'px';
+            floatEmoji.style.top = window.innerHeight + 'px';
+            container.appendChild(floatEmoji);
 
-            gsap.to(balloon, {
+            gsap.to(floatEmoji, {
                 y: -window.innerHeight - 100,
                 x: "random(-50, 50)",
                 opacity: 1,
                 duration: 4 + Math.random() * 3,
                 ease: "power1.out",
-                onComplete: () => balloon.remove()
+                onComplete: () => floatEmoji.remove()
             });
         }
 
@@ -153,9 +157,26 @@
             });
         }
 
+        function animateMessage() {
+            gsap.to(message, {
+                scale: 1.1,
+                backgroundColor: 'rgba(255, 215, 0, 0.4)',  // Golden color
+                duration: 0.2,
+                ease: "power1.out",
+                onComplete: () => {
+                    gsap.to(message, {
+                        scale: 1,
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        duration: 0.3,
+                        ease: "power1.inOut"
+                    });
+                }
+            });
+        }
+
         function surprise(event) {
             clickCount++;
-            createBalloon();
+            createFloatingEmoji();
 
             // Create multiple sparkles
             for (let i = 0; i < 10; i++) {
@@ -163,18 +184,21 @@
             }
 
             if (clickCount === 1) {
-                message.innerText = "Wow! You're 29 and still as amazing as ever!";
+                message.innerHTML = "Wow! You're 29 and still as amazing as ever!<br>Keep tapping! More surprises await!";
             } else if (clickCount === 2) {
-                message.innerText = "Keep tapping! More surprises await!";
-            } else if (clickCount === 7) {
+                message.innerText = "Keep tapping! You almost got there!!";
+            } else if (clickCount === 5) {
                 message.innerHTML = "You're not just a year older, you're a year more awesome!<br>Here's to many more fantastic years ahead!";
-                setInterval(createBalloon, 500);
+                setInterval(createFloatingEmoji, 500);
             }
 
-            // Bounce animation
+            // Animate the message
+            animateMessage();
+
+            // Bounce animation for the cake
             gsap.to(cake, {
-                y: -50,
-                duration: 0.15,
+                y: -30,
+                duration: 0.2,
                 ease: "power1.out",
                 onComplete: () => {
                     gsap.to(cake, {
@@ -196,7 +220,7 @@
 
         // Floating animation for the cake
         gsap.to(cake, {
-            y: "+=20",
+            y: "+=10",
             repeat: -1,
             yoyo: true,
             duration: 1.5,
