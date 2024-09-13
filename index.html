@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 29th Birthday, Brenda!</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        .container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 3em;
+            color: #ff69b4;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cake {
+            font-size: 100px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .balloon {
+            font-size: 50px;
+            position: absolute;
+            opacity: 0;
+        }
+        .message {
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 80%;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            .cake {
+                font-size: 80px;
+            }
+            .message {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            .cake {
+                font-size: 60px;
+            }
+            .message {
+                font-size: 1em;
+            }
+            .balloon {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Happy 29th Birthday, Brenda!</h1>
+        <div class="cake" id="cake">🎂</div>
+        <p class="message" id="message">Tap the cake for a surprise!</p>
+    </div>
+
+    <script>
+        const cake = document.getElementById('cake');
+        const message = document.getElementById('message');
+        const container = document.querySelector('.container');
+        let clickCount = 0;
+
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            balloon.innerText = '🎈';
+            balloon.style.left = Math.random() * window.innerWidth + 'px';
+            balloon.style.top = window.innerHeight + 'px';
+            container.appendChild(balloon);
+
+            gsap.to(balloon, {
+                y: -window.innerHeight - 100,
+                x: "random(-50, 50)",
+                opacity: 1,
+                duration: 4 + Math.random() * 3,
+                ease: "power1.out",
+                onComplete: () => balloon.remove()
+            });
+        }
+
+        function surprise() {
+            clickCount++;
+            createBalloon();
+
+            if (clickCount === 1) {
+                message.innerText = "Wow! You're 29 and still as amazing as ever!";
+            } else if (clickCount === 5) {
+                message.innerText = "Keep tapping! More surprises await!";
+            } else if (clickCount === 10) {
+                message.innerHTML = "You're not just a year older, you're a year more awesome!<br>Here's to many more fantastic years ahead!";
+                setInterval(createBalloon, 500);
+            }
+
+            gsap.to(cake, {
+                rotation: "+=360",
+                duration: 1,
+                ease: "bounce.out"
+            });
+        }
+
+        cake.addEventListener('click', surprise);
+        cake.addEventListener('touchstart', surprise);
+
+        // Initial animation
+        gsap.from("h1", {opacity: 0, y: -50, duration: 1, ease: "back.out"});
+        gsap.from(cake, {opacity: 0, scale: 0, duration: 1, delay: 0.5, ease: "elastic.out"});
+        gsap.from(message, {opacity: 0, y: 50, duration: 1, delay: 1, ease: "power2.out"});
+
+        // Prevent zooming on double tap (for iOS)
+        document.addEventListener('touchmove', function (event) {
+            if (event.scale !== 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
