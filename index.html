@@ -67,6 +67,14 @@
             border-radius: 10px;
             backdrop-filter: blur(5px);
         }
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+        }
 
         @media (max-width: 768px) {
             h1 {
@@ -128,23 +136,53 @@
             });
         }
 
-        function surprise() {
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            document.body.appendChild(sparkle);
+
+            gsap.to(sparkle, {
+                x: 'random(-50, 50)',
+                y: 'random(-50, 50)',
+                opacity: 0,
+                duration: 1,
+                ease: "power1.out",
+                onComplete: () => sparkle.remove()
+            });
+        }
+
+        function surprise(event) {
             clickCount++;
             createBalloon();
 
+            // Create multiple sparkles
+            for (let i = 0; i < 10; i++) {
+                createSparkle(event.clientX, event.clientY);
+            }
+
             if (clickCount === 1) {
                 message.innerText = "Wow! You're 29 and still as amazing as ever!";
-            } else if (clickCount === 5) {
+            } else if (clickCount === 2) {
                 message.innerText = "Keep tapping! More surprises await!";
-            } else if (clickCount === 10) {
+            } else if (clickCount === 7) {
                 message.innerHTML = "You're not just a year older, you're a year more awesome!<br>Here's to many more fantastic years ahead!";
                 setInterval(createBalloon, 500);
             }
 
+            // Bounce animation
             gsap.to(cake, {
-                rotation: "+=360",
-                duration: 1,
-                ease: "bounce.out"
+                y: -50,
+                duration: 0.15,
+                ease: "power1.out",
+                onComplete: () => {
+                    gsap.to(cake, {
+                        y: 0,
+                        duration: 0.4,
+                        ease: "bounce.out"
+                    });
+                }
             });
         }
 
@@ -155,6 +193,15 @@
         gsap.from("h1", {opacity: 0, y: -50, duration: 1, ease: "back.out"});
         gsap.from(cake, {opacity: 0, scale: 0, duration: 1, delay: 0.5, ease: "elastic.out"});
         gsap.from(message, {opacity: 0, y: 50, duration: 1, delay: 1, ease: "power2.out"});
+
+        // Floating animation for the cake
+        gsap.to(cake, {
+            y: "+=20",
+            repeat: -1,
+            yoyo: true,
+            duration: 1.5,
+            ease: "sine.inOut"
+        });
 
         // Prevent zooming on double tap (for iOS)
         document.addEventListener('touchmove', function (event) {
